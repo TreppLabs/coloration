@@ -68,50 +68,53 @@
 //   
 //
 
-// color #s, array indexing, etc starts at 0
-var TWO = 2;
-var PHI = 1.61803398875;   // "Golden ratio"
-var SEVEN_FOURTHS = 7/4;
+// STRATEGY 
+// only strategy we try is to split largest interval into fractions
+// fraction determined by "divisor"
+// 2 means split evenly, lower numbers split unevenly
 
-var divisor = SEVEN_FOURTHS;
-var name = '<<SEVEN_FOURTHS>>';
+// We'll try a bunch of divisors over a range, spit out final value of wMin, wAvg after many splits
+
+//console.log('divisor wMin wAvg');
 
 
-var colors = [0.0, 1.0];
-var wMin = 1.0;
+for (var divisor = 1.30; divisor <= 2.001; divisor += 0.01) {	
+	var colors = [0.0, 1.0];
+	var wMin = 1.0;
 
-var wCount = 2;  // initially 2 colors
-var wAvg = 1.0;
-var wTot = 2;
+	var wCount = 2;  // initially 2 colors
+	var wAvg = 1.0;
+	var wTot = 2;
 
-if (process.argv[2]) {
-  divisor = process.argv[2];
-  console.log('using divisor: ' + divisor);
-  name = process.argv[2];
-}
+  var MAX_COLOR = 500;
 
-for (var k = 2; k<100; k+=1) {
-  var intervalEndpoints = findLargestInterval(colors);
-  var intervalLength = intervalEndpoints[1] - intervalEndpoints[0];
 
-  var newVal = intervalEndpoints[0] + (intervalEndpoints[1]-intervalEndpoints[0])/divisor;
+	for (var k = 2; k<MAX_COLOR; k+=1) {
+	  var intervalEndpoints = findLargestInterval(colors);
+	  var intervalLength = intervalEndpoints[1] - intervalEndpoints[0];
 
-  colors.push(newVal);
+	  var newVal = intervalEndpoints[0] + (intervalEndpoints[1]-intervalEndpoints[0])/divisor;
 
-//  console.log('largest is: ' + intervalEndpoints[0] + ', ' + intervalEndpoints[1] + ', split at: ' + newVal);
+	  colors.push(newVal);
 
-  colors.sort(function(a,b) {return a-b});
-//  console.log('colors now: ' + colors);
-  var smallestIntervalEndpoints = findSmallestInterval(colors);
-  var smallestIntervalLength = smallestIntervalEndpoints[1] - smallestIntervalEndpoints[0];
-  var wK = smallestIntervalLength/(1/(k));
-  if (wK < wMin) wMin = wK;
-  wTot += wK;
-  wCount += 1;
-  wAvg = wTot/wCount;
+	//  console.log('largest is: ' + intervalEndpoints[0] + ', ' + intervalEndpoints[1] + ', split at: ' + newVal);
 
-  // also do average, here
-  console.log(name + ', k: ' + k + ', wK: ' + wK + ', wMin: ' + wMin + ', wAvg: ' + wAvg);
+	  colors.sort(function(a,b) {return a-b});
+	//  console.log('colors now: ' + colors);
+	  var smallestIntervalEndpoints = findSmallestInterval(colors);
+	  var smallestIntervalLength = smallestIntervalEndpoints[1] - smallestIntervalEndpoints[0];
+	  var wK = smallestIntervalLength/(1/(k));
+	  if (wK < wMin) wMin = wK;
+	  wTot += wK;
+	  wCount += 1;
+	  wAvg = wTot/wCount;
+
+	  if (k == MAX_COLOR-1) {
+		  console.log('divisor: ' + divisor + ', k: ' + k + ', wK: ' + wK + ', wMin: ' + wMin + ', wAvg: ' + wAvg);
+	    //console.log(divisor + ' ' + wMin );
+	    //console.log(divisor + ' ' + wAvg );
+	  }
+	}
 }
 
 function findLargestInterval(arr) {
